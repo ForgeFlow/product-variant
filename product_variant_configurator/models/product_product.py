@@ -43,7 +43,13 @@ class ProductProduct(models.Model):
     @api.depends("product_tmpl_id.no_create_variants")
     def _compute_attributes_editable(self):
         for rec in self:
-            rec.attributes_editable = rec.product_tmpl_id.no_create_variants == "yes"
+            rec.attributes_editable = (
+                rec.product_tmpl_id.no_create_variants == "yes"
+                or (
+                    rec.product_tmpl_id.no_create_variants == "empty"
+                    and rec.product_tmpl_id.categ_id.no_create_variants
+                )
+            )
 
     def _get_product_attributes_values_dict(self):
         # Retrieve first the attributes from template to preserve order
